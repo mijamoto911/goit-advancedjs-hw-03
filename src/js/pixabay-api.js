@@ -1,15 +1,32 @@
+import axios from 'axios';
+
+axios.defaults.baseURL = 'https://pixabay.com/api/';
+
 const API_KEY = '45206058-c611c9adec5d897ba1c6c02b0';
 
-export const searchPhotos = searchValue => {
-  const BASE_URL = 'https://pixabay.com/api/';
-  const url = `${BASE_URL}?key=${API_KEY}&q=${encodeURIComponent(
-    searchValue
-  )}&image_type=photo&orientation=horizontal&safesearch=true`;
+export const searchPhotos = async (query, page) => {
+  const axiosConfigs = {
+    params: {
+      key: API_KEY,
+      q: query,
+      image_type: 'photo',
+      orientation: 'horizontal',
+      safesearch: true,
+      page: page,
+      per_page: 15,
+    },
+  };
 
-  return fetch(url).then(response => {
-    if (!response.ok) {
-      throw new Error(response.status);
+  try {
+    const response = await axios.get('', axiosConfigs);
+
+    if (response && response.data && response.data.hits) {
+      return response.data;
+    } else {
+      throw new Error('Unexpected response structure');
     }
-    return response.json();
-  });
+  } catch (error) {
+    console.error('Something went wrong:', error.message || error);
+    throw error;
+  }
 };
